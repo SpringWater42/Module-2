@@ -6,6 +6,8 @@ state: {
   users: [],       // for setUsers
   employees: [],   // for setEmployees
   payslip: [],     // for setPayslip
+  performance: [],     // for setPerformace
+  attendance: [],     // for setAttendance
 },
   getters: {
   },
@@ -18,6 +20,12 @@ state: {
     },
     setPayslip(state ,payload){
       state.payslip = payload
+    },
+    setPerformace(state ,payload){
+      state.setPerformace = payload
+    },
+    setAttendance(state ,payload){
+      state.attendance = payload
     }
   },
   actions: {
@@ -26,15 +34,34 @@ state: {
       
       commit('setUsers' , data.data.users)
     },
+
+    async getPayslip({commit}){
+      let data = await axios.get('http://localhost:9090/payslip')
+      
+      commit('setPayslip', data.data.payslip)
+    },
+
+    async getPerformace({commit}){
+      let data = await axios.get('http://localhost:9090/performace')
+      commit('setPerformace' , data.data.performance)
+    },
+    async postPerformace({commit}, payload) {
+       const response = await axios.post('http://localhost:9090/performace', payload);
+       commit('setEmployees', response.data.performance);
+    },
+
+  async getAttendance({commit}){
+        let data = await axios.get('http://localhost:9090/attendance')
+        commit('setAttendance' , data.data.attendance)
+      },
+ async postAttendance({commit}, payload) {
+    const response = await axios.post('http://localhost:9090/attendance', payload);
+    commit('setAttendace', response.data.attendance);
+ },
     async getEmployees({commit}){
       let data = await axios.get('http://localhost:9090/employees')
 
       commit('setEmployees' , data.data.employees)
-    },
-    async getPayslip({commit}){
-      let data = await axios.get('http://localhost:9090/payslip')
-
-      commit('setPayslip', data.data.payslip)
     },
     async postEmployees({commit}, payload) {
   try {
@@ -43,6 +70,7 @@ state: {
   } catch (error) {
     return error
   }
+
 }
   },
   modules: {
