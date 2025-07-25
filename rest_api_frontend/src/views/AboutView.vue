@@ -2,10 +2,6 @@
   <div class="about">
     <h1>This is an about page</h1>
 
-
-
-
-
     <div class="payslip-card-container">
       <div
         v-for="payslip in payslips"
@@ -17,6 +13,14 @@
         <p class="payslip-detail">Hours Worked: {{ payslip.hoursWorked }}</p>
         <p class="payslip-detail">Leave Deductions: {{ payslip.leaveDeductions }}</p>
         <p class="payslip-detail">Final Salary: R {{ payslip.finalSalary }}</p>
+
+        <!-- Show calculated salary details if calculated -->
+        <div v-if="payslip.takeHomePay" class="calculated-details">
+          <p>Taxable Income: R {{ payslip.takeHomePay.taxableIncome }}</p>
+          <p>Monthly PAYE: R {{ payslip.takeHomePay.monthlyPAYE }}</p>
+          <p>UIF: R {{ payslip.takeHomePay.uif }}</p>
+          <p><strong>Take Home Pay: R {{ payslip.takeHomePay.takeHome }}</strong></p>
+        </div>
 
         <button class="download-btn" @click="downloadPDF(payslip)">
           Download PDF
@@ -39,11 +43,6 @@ export default {
     payslips() {
       return this.$store.state.payslip;
     }
-  },
-  data() {
-    return {
-      selectedEmployee: null,
-    };
   },
   methods: {
     calculateTakeHome(employee) {
@@ -73,12 +72,13 @@ export default {
       const uif = Math.min(salary * 0.01, 177.12);
       const takeHome = salary - monthlyPAYE - uif;
 
-      employee.takeHomePay = {
+      // Assign calculated data back to the payslip object (reactive)
+      this.$set(employee, "takeHomePay", {
         taxableIncome: taxableIncome.toFixed(2),
         monthlyPAYE: monthlyPAYE.toFixed(2),
         uif: uif.toFixed(2),
         takeHome: takeHome.toFixed(2),
-      };
+      });
     },
     downloadPDF(employee) {
       this.calculateTakeHome(employee);
@@ -133,7 +133,8 @@ export default {
   text-align: center;
 }
 
-.payslip-detail {
+.payslip-detail,
+.calculated-details p {
   margin: 4px 0;
   font-size: 0.95rem;
   text-align: center;
@@ -141,7 +142,6 @@ export default {
 
 .download-btn {
   margin-top: 10px;
-  padding-bottom: 1000%;
   background-color: #ffffff;
   color: #202088;
   border: none;

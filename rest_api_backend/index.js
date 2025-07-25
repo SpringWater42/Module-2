@@ -4,8 +4,8 @@ import { config } from 'dotenv';
 import { getUserCon } from './controller/usersCon.js';
 
 import { getEmployeeCon, postEmployeesCon } from './controller/employeeCon.js';
-import { getPerformanceCon, postPerformaceCon } from './controller/performanceCon.js';
-import { getAttendanceCon,  postPerformaceCon } from './controller/attendanceCon.js';
+import { getPerformanceCon, postPerformanceCon } from './controller/performanceCon.js';
+import { getAttendanceCon,  postAttendanceCon } from './controller/attendanceCon.js';
 
 import { getPayslipCon } from './controller/payrollCon.js';
 import cors from 'cors';
@@ -24,10 +24,11 @@ app.get('/employees', getEmployeeCon);
 app.post('/employees', postEmployeesCon);
 
 app.get('/performance', getPerformanceCon);
-app.post('performance', postPerformaceCon)
+app.post('/performance', postPerformanceCon)
 
 app.get('/attendance', getAttendanceCon);
-app.post('/attendance', postAttendanceCon)
+
+app.post('/attendance',  postAttendanceCon)
 
 app.get('/payslip', getPayslipCon);
 

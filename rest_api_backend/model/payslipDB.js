@@ -10,4 +10,10 @@ const getPayslip = async() => {
     }
 }
 
-export {getPayslip}
+const postPayslip = async (employee_id, name, position, department, salary, employmentHistory, contact) => {
+    await pool.query(`INSERT INTO employees (employee_id, name, position_, department, salary, employmentHistory, contact) VALUES (?,?,?,?,?,?,?);`,
+    [employee_id, name, position, department, salary, employmentHistory, contact]
+    )
+}
+
+export {getPayslip , postPayslip}

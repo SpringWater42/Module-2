@@ -7,7 +7,7 @@ state: {
   employees: [],   // for setEmployees
   payslip: [],     // for setPayslip
   performance: [],     // for setPerformace
-  attendance: [],     // for setAttendance
+  attendance: []    // for setAttendance
 },
   getters: {
   },
@@ -21,12 +21,12 @@ state: {
     setPayslip(state ,payload){
       state.payslip = payload
     },
-    setPerformace(state ,payload){
-      state.setPerformace = payload
+    setPerformance(state ,performance){
+      state.performance = performance
     },
-    setAttendance(state ,payload){
-      state.attendance = payload
-    }
+     setAttendance(state, attendance) {
+    state.attendance = attendance;
+  },
   },
   actions: {
     async getUsers({commit}){
@@ -41,23 +41,36 @@ state: {
       commit('setPayslip', data.data.payslip)
     },
 
-    async getPerformace({commit}){
-      let data = await axios.get('http://localhost:9090/performace')
-      commit('setPerformace' , data.data.performance)
-    },
-    async postPerformace({commit}, payload) {
-       const response = await axios.post('http://localhost:9090/performace', payload);
+  async getPerformance({ commit }) {
+  try {
+    const response = await axios.get("http://localhost:9090/performance"); // <- PROBABLY MISSPELLED
+    commit("setPerformance", response.data);
+  } catch (error) {
+    // console.error("Error fetching performance:", error);
+  }
+},
+    async postPerformance({commit}, payload) {
+       const response = await axios.post('http://localhost:9090/performance', payload);
        commit('setEmployees', response.data.performance);
     },
 
-  async getAttendance({commit}){
-        let data = await axios.get('http://localhost:9090/attendance')
-        commit('setAttendance' , data.data.attendance)
-      },
+
+async getAttendance({ commit }) {
+  try {
+    const res = await axios.get('http://localhost:9090/attendance');
+    console.log("Attendance API result in store:", res.data); // 👈 add this
+    commit('setAttendance', res.data.attendance);
+  } catch (err) {
+    console.error('Error fetching attendance:', err);
+  }
+},
  async postAttendance({commit}, payload) {
     const response = await axios.post('http://localhost:9090/attendance', payload);
-    commit('setAttendace', response.data.attendance);
+    commit('setAttendance', response.data.attendance);
  },
+
+
+
     async getEmployees({commit}){
       let data = await axios.get('http://localhost:9090/employees')
 
