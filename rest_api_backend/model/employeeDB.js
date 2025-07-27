@@ -15,5 +15,23 @@ const postEmployees = async (employee_id, name, position, department, salary, em
     [employee_id, name, position, department, salary, employmentHistory, contact]
     )
 }
+
+const patchEmployees = async (employee_id, name, position, department, salary, employmentHistory, contact) => {
+  try {
+    console.log('Updating employee:', { employee_id, name, position, department, salary, employmentHistory, contact });
+
+    await pool.query(
+      `UPDATE employees 
+       SET name = ?, position_ = ?, department = ?, salary = ?, employmentHistory = ?, contact = ?
+       WHERE employee_id = ?;`,
+      [name, position, department, salary, employmentHistory, contact, employee_id]
+    );
+
+    console.log('Update successful');
+  } catch (error) {
+    console.error('Error updating employee:', error);
+    throw error;
+  }
+};
  
-export {getEmployees , postEmployees}
+export {getEmployees , postEmployees , patchEmployees}

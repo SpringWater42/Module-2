@@ -1,4 +1,4 @@
-import { getAttendance, postAttendance as insertAttendance } from "../model/attendanceDB.js";
+import { getAttendance, postAttendance } from "../model/attendanceDB.js";
 
 // Controller to get attendance
  const getAttendanceCon = async (req, res) => {
@@ -8,17 +8,17 @@ import { getAttendance, postAttendance as insertAttendance } from "../model/atte
 // Controller to post attendance
  const postAttendanceCon = async (req, res) => {
   try {
-    console.log("Received data:", req.body);
+    console.log("Attendance data:", req.body);
 
-    const { employee_id, name, position, department, salary, employmentHistory, contact } = req.body;
+    const { id , employeeId , date , reason ,  status   } = req.body;
 
-    if (!employee_id) {
-      return res.status(400).json({ error: "Missing employee_id" });
+    if (!employeeId) {
+      return res.status(400).json({ error: "Missing employeeId" });
     }
 
-    console.log("Inserting employee:", employee_id, name, position);
+    console.log("Inserting employee:", id ,employeeId , date , reason ,  status);
 
-    await insertAttendance(employee_id, name, position, department, salary, employmentHistory, contact);
+    await postAttendance( id , employeeId , date , reason ,  status );
 
     res.status(201).json({ message: "Employee added successfully" });
 

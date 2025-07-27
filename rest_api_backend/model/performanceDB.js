@@ -10,9 +10,9 @@ const getPerformance = async() => {
     }
 }
 
-const postPerformance = async (employee_id, name, position, department, salary, employmentHistory, contact) => {
-    await pool.query(`INSERT INTO employees (employee_id, name, position_, department, salary, employmentHistory, contact) VALUES (?,?,?,?,?,?,?);`,
-    [employee_id, name, position, department, salary, employmentHistory, contact]
+const postPerformance = async ( id ,employeeId, rating, description, review_month) => {
+    await pool.query(`INSERT INTO performance ( id ,employeeId, rating, description, review_month) VALUES (?,?,?,?,?);`,
+    [ id ,employeeId, rating, description, review_month]
     )
 }
 

@@ -1,13 +1,44 @@
 <template>
   <div class="container mt-4">
-    <h2 class="mb-4 text-center">Attendance Records</h2>
+    <h2 class="mb-4 text-center">Attendance</h2>
 
     <!-- Add Attendance Button -->
     <div class="text-center mb-4">
-      <button class="btn btn-success" @click="addRecord">Add Attendance</button>
+      <button class="btn btn-success" @click="openAddModal">
+        Add Attendance
+      </button>
     </div>
 
-    <div v-for="(records, employeeId) in groupedAttendance" :key="employeeId" class="mb-5">
+    <!-- Attendance Modal -->
+    <div class="modal fade" id="attendanceModal" tabindex="-1" aria-labelledby="attendanceModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="attendanceModalLabel">
+              {{ isEdit ? 'Edit Attendance' : 'Add Attendance' }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="submitAttendance">
+              <input type="text" v-model="attendanceForm.employeeId" placeholder="Employee ID" required class="form-control mb-2" />
+              <input type="date" v-model="attendanceForm.date" required class="form-control mb-2" />
+              <input type="text" v-model="attendanceForm.reason" placeholder="Reason" required class="form-control mb-2" />
+              <select v-model="attendanceForm.status" required class="form-control mb-3">
+                <option value="">Select Status</option>
+                <option value="Approved">Approved</option>
+                <option value="Pending">Pending</option>
+                <option value="Denied">Denied</option>
+              </select>
+              <input type="submit" :value="isEdit ? 'Update' : 'Submit'" class="btn btn-primary w-100" />
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grouped Attendance Table -->
+    <div v-for="(entries, employeeId) in groupedAttendance" :key="employeeId" class="mb-5">
       <h4 class="text-primary">Employee ID: {{ employeeId }}</h4>
       <table class="table table-bordered table-hover table-striped">
         <thead class="table-dark">
@@ -20,16 +51,16 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="record in records" :key="record.id">
-            <td>{{ record.id }}</td>
-            <td>{{ formatDate(record.date) }}</td>
-            <td>{{ record.reason }}</td>
+          <tr v-for="entry in entries" :key="entry.id">
+            <td>{{ entry.id }}</td>
+            <td>{{ formatDate(entry.date) }}</td>
+            <td>{{ entry.reason }}</td>
             <td>
-              <span :class="badgeClass(record.status)">{{ record.status }}</span>
+              <span :class="badgeClass(entry.status)">{{ entry.status }}</span>
             </td>
             <td>
-              <button class="btn btn-sm btn-primary me-2" @click="editRecord(record)">Edit</button>
-              <button class="btn btn-sm btn-danger" @click="deleteRecord(record.id)">Delete</button>
+              <button class="btn btn-sm btn-primary me-2" @click="editAttendance(entry)">Edit</button>
+              <button class="btn btn-sm btn-danger" @click="deleteAttendance(entry.id)">Delete</button>
             </td>
           </tr>
         </tbody>
@@ -40,11 +71,24 @@
 
 <script>
 export default {
+  data() {
+    return {
+      attendanceForm: {
+        id: null,
+        employeeId: '',
+        date: '',
+        reason: '',
+        status: ''
+      },
+      isEdit: false
+    };
+  },
   computed: {
     attendance() {
       return this.$store.state.attendance;
     },
     groupedAttendance() {
+      if (!Array.isArray(this.attendance)) return {};
       return this.attendance.reduce((grouped, entry) => {
         if (!grouped[entry.employeeId]) {
           grouped[entry.employeeId] = [];
@@ -58,6 +102,18 @@ export default {
     this.$store.dispatch('getAttendance');
   },
   methods: {
+    openAddModal() {
+      this.isEdit = false;
+      this.attendanceForm = {
+        id: null,
+        employeeId: '',
+        date: '',
+        reason: '',
+        status: ''
+      };
+      const modal = new bootstrap.Modal(document.getElementById('attendanceModal'));
+      modal.show();
+    },
     formatDate(dateStr) {
       const options = { year: 'numeric', month: 'short', day: 'numeric' };
       return new Date(dateStr).toLocaleDateString(undefined, options);
@@ -74,17 +130,39 @@ export default {
           return 'badge bg-secondary';
       }
     },
-    addRecord() {
-      console.log('Add attendance clicked');
-      // TODO: Implement add logic here (open form/modal)
+    submitAttendance() {
+      const action = this.isEdit ? 'updateAttendance' : 'postAttendance';
+
+      this.$store.dispatch(action, this.attendanceForm)
+        .then(() => {
+          this.$store.dispatch('getAttendance');
+          this.attendanceForm = {
+            id: null,
+            employeeId: '',
+            date: '',
+            reason: '',
+            status: ''
+          };
+          this.isEdit = false;
+          const modal = bootstrap.Modal.getInstance(document.getElementById('attendanceModal'));
+          modal.hide();
+        })
+        .catch(err => {
+          console.error("Failed to submit attendance:", err);
+          alert("Error while submitting attendance.");
+        });
     },
-    editRecord(record) {
-      console.log('Edit record:', record);
-      // TODO: Implement edit logic here (open form/modal)
+    editAttendance(entry) {
+      this.isEdit = true;
+      this.attendanceForm = { ...entry };
+      const modal = new bootstrap.Modal(document.getElementById('attendanceModal'));
+      modal.show();
     },
-    deleteRecord(id) {
-      console.log('Delete record with ID:', id);
-      // TODO: Implement delete logic here (confirmation + API call)
+    deleteAttendance(id) {
+      if (confirm("Are you sure you want to delete this attendance?")) {
+        this.$store.dispatch('deleteAttendance', id)
+          .then(() => this.$store.dispatch('getAttendance'));
+      }
     }
   }
 };

@@ -1,7 +1,34 @@
 <template>
   <div class="performance-container">
     <h3>Performance Reviews</h3>
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Add Performance +
+  </button>
 
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+<form @submit.prevent="submitPerformance">
+  <input type="text" v-model="performanceForm.id" placeholder="performance ID" required />
+  <input type="text" v-model="performanceForm.employeeId" placeholder="Employee ID" required />
+  <input type="number" v-model="performanceForm.rating" placeholder="Rating" required />
+  <input type="text" v-model="performanceForm.description" placeholder="Description" required />
+  <input type="date" v-model="performanceForm.review_month" placeholder="Review Month" required />
+  <input type="submit" value="Submit" />
+</form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br>
+  <br>
     <div v-if="performance && performance.length" class="card-grid">
       <div v-for="item in performance" :key="item.id" class="performance-card">
         <div class="card-header">
@@ -28,9 +55,20 @@
 
 <script>
 export default {
+  data() {
+  return {
+    performanceForm: {
+      id: '',
+      employeeId: '',
+      rating: '',
+      description: '',
+      review_month: ''
+    }
+  };
+},
   computed: {
     performance() {
-      return this.$store.state.performance.performance;
+      return this.$store.state.performance;
     }
   },
   mounted() {
@@ -41,6 +79,24 @@ export default {
       const options = { year: 'numeric', month: 'long' };
       return new Date(dateStr).toLocaleDateString(undefined, options);
     },
+      submitPerformance() {
+  this.$store.dispatch("postPerformance", this.performanceForm)
+    .then(() => {
+      alert("Performance added!");
+      this.$store.dispatch('getPerformance');
+      this.performanceForm = {
+        id: '',
+        employeeId: '',
+        rating: '',
+        description: '',
+        review_month: ''
+      };
+    })
+    .catch(err => {
+      console.error("Error adding performance:", err);
+      alert("Failed to add performance.");
+    });
+},
     editItem(item) {
       console.log("Edit clicked for:", item);
       // Implement edit logic

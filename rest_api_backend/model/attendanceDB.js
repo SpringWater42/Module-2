@@ -10,9 +10,9 @@ const getAttendance = async() => {
     }
 }
 
-const postAttendance = async (employee_id, name, position, department, salary, employmentHistory, contact) => {
-    await pool.query(`INSERT INTO employees (employee_id, name, position_, department, salary, employmentHistory, contact) VALUES (?,?,?,?,?,?,?);`,
-    [employee_id, name, position, department, salary, employmentHistory, contact]
+const postAttendance = async (id , employeeId ,date , reason ,status) => {
+    await pool.query(`INSERT INTO leaverequests (id , employeeId ,date , reason ,status) VALUES (?,?,?,?,?);`,
+    [id , employeeId , date , reason ,status]
     )
 }
 

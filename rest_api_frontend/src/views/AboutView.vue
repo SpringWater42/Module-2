@@ -1,4 +1,37 @@
 <template>
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Add Payslip +
+  </button>
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+
+          <form @submit.prevent="submitPayslip">
+            <input type="text" v-model="payslip.id" placeholder="Payslip ID" required />
+            <br />
+            <input type="text" v-model="payslip.employeeId" placeholder="Employee ID" required />
+            <br />
+            <input type="number" v-model="payslip.hoursWorked" placeholder="Hours Worked" required />
+            <br />
+            <input type="number" v-model="payslip.leaveDeductions" placeholder="Leave Deductions" required />
+            <br />
+            <input type="number" v-model="payslip.finalSalary" placeholder="Final Salary" required />
+            <br />
+            <input type="submit" value="Submit" />
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="about">
     <h1>This is an about page</h1>
 
@@ -7,30 +40,72 @@
         v-for="payslip in payslips"
         :key="payslip.payslipsId"
         class="payslip-card"
-        :id="'payslip-' + payslip.employees_id"
+        :id="'payslip-' + payslip.employeeId"
       >
-        <p class="payslip-title">Employee ID: {{ payslip.employees_id }}</p>
+        <p class="payslip-title">Employee ID: {{ payslip.employeeId }}</p>
         <p class="payslip-detail">Hours Worked: {{ payslip.hoursWorked }}</p>
         <p class="payslip-detail">Leave Deductions: {{ payslip.leaveDeductions }}</p>
         <p class="payslip-detail">Final Salary: R {{ payslip.finalSalary }}</p>
 
-        <!-- Show calculated salary details if calculated -->
         <div v-if="payslip.takeHomePay" class="calculated-details">
           <p>Taxable Income: R {{ payslip.takeHomePay.taxableIncome }}</p>
           <p>Monthly PAYE: R {{ payslip.takeHomePay.monthlyPAYE }}</p>
           <p>UIF: R {{ payslip.takeHomePay.uif }}</p>
           <p><strong>Take Home Pay: R {{ payslip.takeHomePay.takeHome }}</strong></p>
         </div>
-
-        <button class="download-btn" @click="downloadPDF(payslip)">
-          Download PDF
-        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+export default {
+  data() {
+    return {
+      payslip: {
+        id: '',
+        employeeId: '',
+        hoursWorked: '',
+        leaveDeductions: '',
+        finalSalary: ''
+      }
+    };
+  },
+  mounted() {
+    this.$store.dispatch('getPayslip');
+  },
+  computed: {
+    payslips() {
+      return this.$store.state.payslip; // ✅ matches Vuex
+    }
+  },
+  methods: {
+    submitPayslip() {
+      this.$store.dispatch("postPayslip", this.payslip)
+        .then(() => {
+          alert("Payslip added!");
+          this.$store.dispatch('getPayslip');
+          this.payslip = {
+            id: '',
+            employeeId: '',
+            hoursWorked: '',
+            leaveDeductions: '',
+            finalSalary: ''
+          };
+        })
+        .catch(err => {
+          console.error("Error adding payslip:", err);
+          alert("Failed to add payslip.");
+        });
+    }
+  }
+};
+</script>
+
+
+
+
+<!-- <script>
 import { mapState } from "vuex";
 import html2pdf from "html2pdf.js";
 
@@ -98,7 +173,7 @@ export default {
     }
   }
 };
-</script>
+</script> -->
 
 <style scoped>
 .payslip-card-container {

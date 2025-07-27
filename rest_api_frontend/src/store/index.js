@@ -1,91 +1,193 @@
 import { createStore } from 'vuex'
-import axios from  'axios'
+import axios from 'axios'
+
+const API_URL = "http://localhost:9090"
 
 export default createStore({
-state: {
-  users: [],       // for setUsers
-  employees: [],   // for setEmployees
-  payslip: [],     // for setPayslip
-  performance: [],     // for setPerformace
-  attendance: []    // for setAttendance
-},
-  getters: {
+  state: {
+    users: [],
+    employees: [],
+    payslip: [],
+    performance: [],
+    attendance: [],
   },
+  getters: {},
   mutations: {
-    setUsers(state ,payload){
-      state.users = payload
+    setUsers(state, payload) {
+      state.users = payload;
     },
-    setEmployees(state ,payload){
-      state.employees = payload
+    setEmployees(state, payload) {
+      state.employees = payload;
     },
-    setPayslip(state ,payload){
-      state.payslip = payload
+    setPayslip(state, payload) {
+      state.payslip = payload;
     },
-    setPerformance(state ,performance){
-      state.performance = performance
+    setPerformance(state, payload) {
+      state.performance = payload;
     },
-     setAttendance(state, attendance) {
-    state.attendance = attendance;
-  },
+    setAttendance(state, payload) {
+      state.attendance = payload;
+    },
   },
   actions: {
-    async getUsers({commit}){
-      let data = await axios.get('http://localhost:9090/users')
-      
-      commit('setUsers' , data.data.users)
+    // USERS
+    async getUsers({ commit }) {
+      try {
+        const response = await axios.get(`${API_URL}/users`);
+        commit('setUsers', response.data.users);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
     },
-
-    async getPayslip({commit}){
-      let data = await axios.get('http://localhost:9090/payslip')
-      
-      commit('setPayslip', data.data.payslip)
-    },
-
-  async getPerformance({ commit }) {
-  try {
-    const response = await axios.get("http://localhost:9090/performance"); // <- PROBABLY MISSPELLED
-    commit("setPerformance", response.data);
-  } catch (error) {
-    // console.error("Error fetching performance:", error);
-  }
-},
-    async postPerformance({commit}, payload) {
-       const response = await axios.post('http://localhost:9090/performance', payload);
-       commit('setEmployees', response.data.performance);
+    async postUsers({ commit }) {
+      try {
+        const response = await axios.get(`${API_URL}/users`);
+        commit('setUsers', response.data.users);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
     },
 
 
-async getAttendance({ commit }) {
-  try {
-    const res = await axios.get('http://localhost:9090/attendance');
-    console.log("Attendance API result in store:", res.data); // 👈 add this
-    commit('setAttendance', res.data.attendance);
-  } catch (err) {
-    console.error('Error fetching attendance:', err);
-  }
-},
- async postAttendance({commit}, payload) {
-    const response = await axios.post('http://localhost:9090/attendance', payload);
-    commit('setAttendance', response.data.attendance);
- },
-
-
-
-    async getEmployees({commit}){
-      let data = await axios.get('http://localhost:9090/employees')
-
-      commit('setEmployees' , data.data.employees)
+    // PAYSLIP
+    async getPayslip({ commit }) {
+      try {
+        const response = await axios.get(`${API_URL}/payslip`);
+        commit('setPayslip', response.data.payslip);
+      } catch (error) {
+        console.error("Error fetching payslips:", error);
+      }
     },
-    async postEmployees({commit}, payload) {
-  try {
-    const response = await axios.post('http://localhost:9090/employees', payload);
-    commit('setEmployees', response.data.employees);
-  } catch (error) {
-    return error
-  }
 
-}
-  },
-  modules: {
+    async postPayslip({ commit }, payslipData) {
+      try {
+        const response = await axios.post(`${API_URL}/payslip`, payslipData);
+        commit('setPayslip', response.data.payslip);
+        return response;
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    },
+
+    async deletePayslip({ commit }) {
+      try {
+        const response = await axios.get(`${API_URL}/payslip`);
+        commit('setPayslip', response.data.payslip);
+      } catch (error) {
+        console.error("Error deleting payslip:", error);
+      }
+    },
+
+    // PERFORMANCE
+    async getPerformance({ commit }) {
+      try {
+        const response = await axios.get(`${API_URL}/performance`);
+        commit('setPerformance', response.data.performance);
+      } catch (error) {
+        console.error("Error fetching performance:", error);
+      }
+    },
+
+    async postPerformance({ commit }, payload) {
+      try {
+        const response = await axios.post(`${API_URL}/performance`, payload);
+        commit('setPerformance', response.data.performance);
+      } catch (error) {
+        console.error("Error posting performance:", error);
+      }
+    },
+
+    async patchPerformance({ commit }, payload) {
+      try {
+        const response = await axios.post(`${API_URL}/performance`, payload);
+        commit('setPerformance', response.data.performance);
+      } catch (error) {
+        console.error("Error patching performance:", error);
+      }
+    },
+
+    async deletePerformance({ commit }, payload) {
+      try {
+        const response = await axios.post(`${API_URL}/performance`, payload);
+        commit('setPerformance', response.data.performance);
+      } catch (error) {
+        console.error("Error deleting performance:", error);
+      }
+    },
+
+    // ATTENDANCE
+    async getAttendance({ commit }) {
+      try {
+        const response = await axios.get(`${API_URL}/attendance`);
+        commit('setAttendance', response.data.attendance);
+      } catch (error) {
+        console.error('Error fetching attendance:', error);
+      }
+    },
+
+    async postAttendance({ commit }, payload) {
+      try {
+        const response = await axios.post(`${API_URL}/attendance`, payload);
+        commit('setAttendance', response.data.attendance);
+      } catch (error) {
+        console.error("Error posting attendance:", error);
+      }
+    },
+
+    async patchAttendance({ commit }, payload) {
+      try {
+        const response = await axios.post(`${API_URL}/attendance`, payload);
+        commit('setAttendance', response.data.attendance);
+      } catch (error) {
+        console.error("Error patching attendance:", error);
+      }
+    },
+
+    async deleteAttendance({ commit }, payload) {
+      try {
+        const response = await axios.post(`${API_URL}/attendance`, payload);
+        commit('setAttendance', response.data.attendance);
+      } catch (error) {
+        console.error("Error deleting attendance:", error);
+      }
+    },
+
+    // EMPLOYEES
+    async getEmployees({ commit }) {
+      try {
+        const response = await axios.get(`${API_URL}/employees`);
+        commit('setEmployees', response.data.employees);
+      } catch (error) {
+        console.error("Error fetching employees:", error);
+      }
+    },
+
+    async postEmployees({ commit }, payload) {
+      try {
+        const response = await axios.post(`${API_URL}/employees`, payload);
+        commit('setEmployees', response.data.employees);
+      } catch (error) {
+        console.error("Error posting employees:", error);
+        return error;
+      }
+    },
+
+    async patchEmployees({ commit }) {
+      try {
+        const response = await axios.get(`${API_URL}/employees`);
+        commit('setEmployees', response.data.employees);
+      } catch (error) {
+        console.error("Error patching employees:", error);
+      }
+    },
+
+    async deleteEmployees({ commit }) {
+      try {
+        const response = await axios.get(`${API_URL}/employees`);
+        commit('setEmployees', response.data.employees);
+      } catch (error) {
+        console.error("Error deleting employees:", error);
+      }
+    }
   }
-})
+});

@@ -8,23 +8,25 @@ export const getPayslipCon = async(req,res) => {
 
 const postPayslipCon = async (req, res) => {
   try {
-    console.log("Received data:", req.body); 
+    console.log("Received data payroll:", req.body); 
 
-    const { employee_id, name, position, department, salary, employmentHistory, contact } = req.body;
+    const { id, employeeId, hoursWorked, leaveDeductions, finalSalary } = req.body;
 
-    if (!employee_id) {
-      return res.status(400).json({ error: "Missing employee_id" });
+    // Basic validation to ensure all fields are provided
+    if (!id || !employeeId || hoursWorked == null || leaveDeductions == null || finalSalary == null) {
+      return res.status(400).json({ error: "Missing required payslip fields" });
     }
 
-    console.log("Inserting employee:", employee_id, name, position);
+    console.log("Inserting payslip:", id, employeeId, hoursWorked, leaveDeductions, finalSalary);
 
-    await postPayslip(employee_id, name, position, department, salary, employmentHistory, contact);
-    res.status(201).json({ message: "Employee added successfully" });
+    await postPayslip(id, employeeId, hoursWorked, leaveDeductions, finalSalary);
+    
+    res.status(201).json({ message: "Payslip added successfully" });
 
   } catch (err) {
-    console.error("Server Error:", err);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Error adding payslip:", err);
+    res.status(500).json({ error: err.message || "Internal Server Error" });
   }
 };
 
-export { getPayslip , postPayslip}
+export { getPayslip , postPayslipCon}

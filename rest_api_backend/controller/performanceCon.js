@@ -1,27 +1,31 @@
-import { getPerformance ,  postPerformance } from "../model/performanceDB.js"
+import { getPerformance, postPerformance } from "../model/performanceDB.js";
 
-export const getPerformanceCon= async(req,res) => {
-    res.json({performance: await getPerformance()})
-}
-
-
-
-
-
-export const postPerformanceCon= async (req, res) => {
+// GET all performance reviews
+export const getPerformanceCon = async (req, res) => {
   try {
-    console.log("Received data:", req.body); 
+    const data = await getPerformance();
+    res.json({ performance: data });
+  } catch (err) {
+    console.error("Failed to fetch performance data:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
 
-    const { employee_id, name, position, department, salary, employmentHistory, contact } = req.body;
+// POST a new performance review
+ const postPerformanceCon = async (req, res) => {
+  try {
+    console.log("Received data:", req.body);
 
-    if (!employee_id) {
-      return res.status(400).json({ error: "Missing employee_id" });
+    const { id, employeeId, rating, description, review_month } = req.body;
+
+    if (!employeeId) {
+      return res.status(400).json({ error: "Missing employeeId" });
     }
 
-    console.log("Inserting employee:", employee_id, name, position);
+    console.log("Inserting performance record:", id, employeeId, rating, description, review_month);
 
-    await postPerformance(employee_id, name, position, department, salary, employmentHistory, contact);
-    res.status(201).json({ message: "Employee added successfully" });
+    await postPerformance(id, employeeId, rating, description, review_month);
+    res.status(201).json({ message: "Performance added successfully" });
 
   } catch (err) {
     console.error("Server Error:", err);
@@ -29,6 +33,5 @@ export const postPerformanceCon= async (req, res) => {
   }
 };
 
-
-
-export { getPerformance }
+// (Optional) export individual DB function if needed elsewhere
+export { getPerformance , postPerformanceCon };
