@@ -33,5 +33,11 @@ const patchEmployees = async (employee_id, name, position, department, salary, e
     throw error;
   }
 };
- 
-export {getEmployees , postEmployees , patchEmployees}
+
+// model/employeeDB.js
+const deleteEmployees = async (employee_id) => {
+  await pool.query("DELETE FROM employees WHERE employee_id = ?", [employee_id]);
+};
+
+
+export {getEmployees , postEmployees , patchEmployees , deleteEmployees}

@@ -1,10 +1,10 @@
 <template>
-  <!-- Button trigger modal -->
+  <!-- Add Payslip Button -->
   <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
     Add Payslip +
   </button>
 
-  <!-- Modal -->
+  <!-- Modal for Adding Payslip -->
   <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -12,9 +12,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-
           <form @submit.prevent="submitPayslip">
-            <input type="text" v-model="payslip.id" placeholder="Payslip ID" required />
             <br />
             <input type="text" v-model="payslip.employeeId" placeholder="Employee ID" required />
             <br />
@@ -24,46 +22,45 @@
             <br />
             <input type="number" v-model="payslip.finalSalary" placeholder="Final Salary" required />
             <br />
-            <input type="submit" value="Submit" />
+            <input type="submit" value="Submit" class="btn btn-success mt-2" />
           </form>
-
         </div>
       </div>
     </div>
   </div>
 
-  <div class="about">
-    <h1>This is an about page</h1>
+  <!-- Payslip Cards -->
+  <div class="card-container">
+    <div
+      v-for="payslip in payslips"
+      :key="payslip.employeeId"
+      class="payslip-card"
+      :id="'payslip-' + payslip.employeeId"
+    >
+      <p class="payslip-title">Employee ID: {{ payslip.employeeId }}</p>
+      <p class="payslip-detail">Hours Worked: {{ payslip.hoursWorked }}</p>
+      <p class="payslip-detail">Leave Deductions: {{ payslip.leaveDeductions }}</p>
+      <p class="payslip-detail">Final Salary: R {{ payslip.finalSalary }}</p>
 
-    <div class="payslip-card-container">
-      <div
-        v-for="payslip in payslips"
-        :key="payslip.payslipsId"
-        class="payslip-card"
-        :id="'payslip-' + payslip.employeeId"
-      >
-        <p class="payslip-title">Employee ID: {{ payslip.employeeId }}</p>
-        <p class="payslip-detail">Hours Worked: {{ payslip.hoursWorked }}</p>
-        <p class="payslip-detail">Leave Deductions: {{ payslip.leaveDeductions }}</p>
-        <p class="payslip-detail">Final Salary: R {{ payslip.finalSalary }}</p>
-
-        <div v-if="payslip.takeHomePay" class="calculated-details">
-          <p>Taxable Income: R {{ payslip.takeHomePay.taxableIncome }}</p>
-          <p>Monthly PAYE: R {{ payslip.takeHomePay.monthlyPAYE }}</p>
-          <p>UIF: R {{ payslip.takeHomePay.uif }}</p>
-          <p><strong>Take Home Pay: R {{ payslip.takeHomePay.takeHome }}</strong></p>
-        </div>
+      <div v-if="payslip.takeHomePay" class="calculated-details">
+        <p>Taxable Income: R {{ payslip.takeHomePay.taxableIncome }}</p>
+        <p>Monthly PAYE: R {{ payslip.takeHomePay.monthlyPAYE }}</p>
+        <p>UIF: R {{ payslip.takeHomePay.uif }}</p>
+        <p><strong>Take Home Pay: R {{ payslip.takeHomePay.takeHome }}</strong></p>
       </div>
+
+      <!-- Delete Button -->
+      <button @click="deletePayslip(payslip.employeeId)" class="btn btn-danger btn-sm mt-2">Delete</button>
     </div>
   </div>
 </template>
+
 
 <script>
 export default {
   data() {
     return {
       payslip: {
-        id: '',
         employeeId: '',
         hoursWorked: '',
         leaveDeductions: '',
@@ -76,7 +73,7 @@ export default {
   },
   computed: {
     payslips() {
-      return this.$store.state.payslip; // ✅ matches Vuex
+      return this.$store.state.payslip;
     }
   },
   methods: {
@@ -86,7 +83,6 @@ export default {
           alert("Payslip added!");
           this.$store.dispatch('getPayslip');
           this.payslip = {
-            id: '',
             employeeId: '',
             hoursWorked: '',
             leaveDeductions: '',
@@ -102,81 +98,8 @@ export default {
 };
 </script>
 
-
-
-
-<!-- <script>
-import { mapState } from "vuex";
-import html2pdf from "html2pdf.js";
-
-export default {
-  mounted() {
-    this.$store.dispatch("getPayslip");
-  },
-  computed: {
-    ...mapState(["payrollData"]),
-    payslips() {
-      return this.$store.state.payslip;
-    }
-  },
-  methods: {
-    calculateTakeHome(employee) {
-      const salary = employee.finalSalary;
-      const leaveDeductions = employee.leaveDeductions;
-      const travelAllowance = employee.travelAllowance ?? 0;
-
-      const hoursInMonth = 160;
-      const leaveDeductionAmount = leaveDeductions * (salary / hoursInMonth);
-
-      const leaveDeduction = Math.min(
-        leaveDeductionAmount,
-        salary * 0.275,
-        350000
-      );
-      const travelDeduction = travelAllowance > 0 ? travelAllowance * 0.2 : 0;
-      const taxableIncome = salary - leaveDeduction - travelDeduction;
-
-      let paye = 0;
-      if (taxableIncome <= 237100) {
-        paye = taxableIncome * 0.18;
-      } else {
-        paye = 42678 + (taxableIncome - 237100) * 0.26;
-      }
-
-      const monthlyPAYE = paye / 12;
-      const uif = Math.min(salary * 0.01, 177.12);
-      const takeHome = salary - monthlyPAYE - uif;
-
-      // Assign calculated data back to the payslip object (reactive)
-      this.$set(employee, "takeHomePay", {
-        taxableIncome: taxableIncome.toFixed(2),
-        monthlyPAYE: monthlyPAYE.toFixed(2),
-        uif: uif.toFixed(2),
-        takeHome: takeHome.toFixed(2),
-      });
-    },
-    downloadPDF(employee) {
-      this.calculateTakeHome(employee);
-      this.$nextTick(() => {
-        const element = document.getElementById(
-          "payslip-" + employee.employees_id
-        );
-        const options = {
-          margin: 0.5,
-          filename: `Payslip_${employee.employees_id}.pdf`,
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: { scale: 2 },
-          jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
-        };
-        html2pdf().set(options).from(element).save();
-      });
-    }
-  }
-};
-</script> -->
-
 <style scoped>
-.payslip-card-container {
+.card-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -187,7 +110,7 @@ export default {
 .payslip-card {
   background: linear-gradient(to right, #202088, #794a79);
   border-radius: 10px;
-  padding: 20px;
+  padding: 15px;
   width: 300px;
   color: #fff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -213,22 +136,6 @@ export default {
   margin: 4px 0;
   font-size: 0.95rem;
   text-align: center;
-}
-
-.download-btn {
-  margin-top: 10px;
-  background-color: #ffffff;
-  color: #202088;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
-}
-
-.download-btn:hover {
-  background-color: #ddddff;
 }
 
 @media (max-width: 768px) {

@@ -1,31 +1,27 @@
-import { getPerformance, postPerformance } from "../model/performanceDB.js";
+import { getPerformance ,  postPerformance , deletePerformance } from "../model/performanceDB.js"
 
-// GET all performance reviews
-export const getPerformanceCon = async (req, res) => {
+export const getPerformanceCon= async(req,res) => {
+    res.json({performance: await getPerformance()})
+}
+
+
+
+
+
+export const postPerformanceCon= async (req, res) => {
   try {
-    const data = await getPerformance();
-    res.json({ performance: data });
-  } catch (err) {
-    console.error("Failed to fetch performance data:", err);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
+    console.log("Received data:", req.body); 
 
-// POST a new performance review
- const postPerformanceCon = async (req, res) => {
-  try {
-    console.log("Received data:", req.body);
-
-    const { id, employeeId, rating, description, review_month } = req.body;
+    const { employeeId, name, position, department, salary, employmentHistory, contact } = req.body;
 
     if (!employeeId) {
       return res.status(400).json({ error: "Missing employeeId" });
     }
 
-    console.log("Inserting performance record:", id, employeeId, rating, description, review_month);
+    console.log("Inserting employee:", employeeId, name, position);
 
-    await postPerformance(id, employeeId, rating, description, review_month);
-    res.status(201).json({ message: "Performance added successfully" });
+    await postPerformance(employeeId, name, position, department, salary, employmentHistory, contact);
+    res.status(201).json({ message: "Employee added successfully" });
 
   } catch (err) {
     console.error("Server Error:", err);
@@ -33,5 +29,16 @@ export const getPerformanceCon = async (req, res) => {
   }
 };
 
-// (Optional) export individual DB function if needed elsewhere
-export { getPerformance , postPerformanceCon };
+export const deletePerformanceCon = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await deletePerformance(id);
+    res.status(200).json({ message: "Performance record deleted." });
+  } catch (err) {
+    console.error("Error deleting performance:", err);
+    res.status(500).json({ error: "Failed to delete performance." });
+  }
+};
+
+
+export { getPerformance }

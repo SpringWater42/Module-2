@@ -1,8 +1,8 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import UsersView from '@/views/UsersView.vue'
 import AttendView from '@/views/AttendView.vue'
 import PerView from '@/views/PerView.vue'
+import DashView from '@/views/DashView.vue'
 
 const routes = [
   {
@@ -13,7 +13,7 @@ const routes = [
   {
     path: '/users',
     name: 'users',
-    component: UsersView
+    component: DashView
   },
   {
     path: '/per',

@@ -69,14 +69,14 @@ export default createStore({
       }
     },
 
-    async deletePayslip({ commit }) {
-      try {
-        const response = await axios.get(`${API_URL}/payslip`);
-        commit('setPayslip', response.data.payslip);
-      } catch (error) {
-        console.error("Error deleting payslip:", error);
-      }
-    },
+async deletePayslip({ commit }, employeeId) {
+  try {
+    await axios.delete(`${API_URL}/payslip/${employeeId}`);
+  } catch (err) {
+    console.error("Vuex deletePayslip error:", err);
+    throw err;
+  }
+},
 
     // PERFORMANCE
     async getPerformance({ commit }) {
@@ -106,14 +106,14 @@ export default createStore({
       }
     },
 
-    async deletePerformance({ commit }, payload) {
-      try {
-        const response = await axios.post(`${API_URL}/performance`, payload);
-        commit('setPerformance', response.data.performance);
-      } catch (error) {
-        console.error("Error deleting performance:", error);
-      }
-    },
+      async deletePerformance({ commit }, id) {
+    try {
+      await axios.delete(`http://localhost:9090/performance/${id}`);
+    } catch (error) {
+      console.error("Error in deletePerformance:", error);
+      throw error;
+    }
+  },
 
     // ATTENDANCE
     async getAttendance({ commit }) {
@@ -142,16 +142,19 @@ export default createStore({
         console.error("Error patching attendance:", error);
       }
     },
-
-    async deleteAttendance({ commit }, payload) {
-      try {
-        const response = await axios.post(`${API_URL}/attendance`, payload);
-        commit('setAttendance', response.data.attendance);
-      } catch (error) {
-        console.error("Error deleting attendance:", error);
-      }
-    },
-
+async deleteAttendance({ commit }, id) {
+  try {
+    const response = await axios.delete(`${API_URL}/attendance/${id}`);
+    // Optionally update state if your backend returns updated attendance list
+    if (response.data.attendance) {
+      commit('setAttendance', response.data.attendance);
+    }
+    return response;
+  } catch (error) {
+    console.error("Error deleting attendance:", error);
+    throw error;
+  }
+},
     // EMPLOYEES
     async getEmployees({ commit }) {
       try {
@@ -181,13 +184,14 @@ export default createStore({
       }
     },
 
-    async deleteEmployees({ commit }) {
-      try {
-        const response = await axios.get(`${API_URL}/employees`);
-        commit('setEmployees', response.data.employees);
-      } catch (error) {
-        console.error("Error deleting employees:", error);
-      }
+ async deleteEmployee({ dispatch }, employeeId) {
+    try {
+      await axios.delete(`http://localhost:9090/employees/${employeeId}`);
+      dispatch('getEmployees'); // Refresh list after deletion
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+      alert("Failed to delete employee.");
     }
   }
+}
 });
