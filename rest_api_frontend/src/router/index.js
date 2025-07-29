@@ -1,37 +1,36 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import UsersView from '@/views/UsersView.vue'
-import AttendView from '@/views/AttendView.vue'
-import PerView from '@/views/PerView.vue'
+import DashboardView from '../views/DashboardView.vue'
+import PayRollView from '@/views/PayrollView.vue'
+import AttendanceView from '@/views/AttendanceView.vue'
+import PerformanceView from '@/views/PerformanceView.vue'
+import EmployeesView from '@/views/EmployeesView.vue'
 
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: HomeView
+    name: 'DashboardView',
+    component: DashboardView
   },
   {
-    path: '/users',
-    name: 'users',
-    component: UsersView
+    path: '/employees',
+    name: 'employees',
+    component: EmployeesView,
+  
   },
   {
-    path: '/per',
-    name: 'per',
-    component: PerView
+    path: '/payroll',
+    name: 'payroll',
+    component: PayRollView
   },
   {
-    path: '/attend',
-    name: 'attend',
-    component: AttendView
+    path: '/attendance',
+    name: 'attendance',
+    component: AttendanceView
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+    path: '/performance',
+    name: 'performance',
+    component: PerformanceView
   },
 ]
 
@@ -41,3 +40,4 @@ const router = createRouter({
 })
 
 export default router
+

@@ -101,12 +101,16 @@ export default {
       console.log("Edit clicked for:", item);
       // Implement edit logic
     },
-    deleteItem(id) {
-      console.log("Delete clicked for ID:", id);
-      // Implement delete logic
-    }
-  }
-}
+   deleteItem(id) {
+  if (confirm("Are you sure you want to delete this performance entry?")) {
+    this.$store.dispatch("deletePerformance", id)
+      .then(() => {
+        alert("Performance deleted successfully.");
+      })
+      .catch((err) => {
+        console.error("Delete failed:", err);
+        alert("Failed to delete performance.");
+      })}}}};
 </script>
 
 <style>
@@ -114,7 +118,7 @@ export default {
   max-width: 1100px;
   margin: 2rem auto;
   padding: 1rem;
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .card-grid {
@@ -124,92 +128,100 @@ export default {
 }
 
 .performance-card {
-  background-color: #fff;
-  border: 1px solid #dcdcdc;
-  border-radius: 10px;
-  padding: 1rem;
+  background: linear-gradient(to bottom right, #1f85c4, #403434);
+  border-radius: 16px;
+  padding: 1.5rem;
   box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.05),
-    0 4px 10px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.3s ease, transform 0.2s ease;
+    0 2px 6px rgba(0, 0, 0, 0.05),
+    0 8px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid #e1e1e1;
 }
 
 .performance-card:hover {
+  transform: translateY(-6px);
   box-shadow:
-    0 4px 8px rgba(0, 0, 0, 0.06),
-    0 8px 20px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
+    0 6px 12px rgba(0, 0, 0, 0.08),
+    0 10px 30px rgba(0, 0, 0, 0.12);
 }
 
 .card-header {
   display: flex;
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .avatar {
-  background-color: #4CAF50;
+  background: linear-gradient(to right, #4caf50, #81c784);
   color: white;
   border-radius: 50%;
-  width: 42px;
-  height: 42px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 1.1rem;
-  margin-right: 0.75rem;
+  font-size: 1.2rem;
+  margin-right: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .card-info h4 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #ffffff;
 }
 
 .card-info .rating {
   margin: 0.25rem 0 0;
-  color: #777;
+  color: #ffffff;
   font-size: 0.95rem;
 }
 
 .description {
-  margin: 0.75rem 0;
+  margin: 1rem 0;
   font-size: 0.95rem;
-  color: #333;
+  color: #d4d0d0;
+  line-height: 1.5;
 }
 
 .review-date {
   font-size: 0.9rem;
-  color: #666;
+  color: #e1dfdf;
   margin-bottom: 0.75rem;
 }
 
 .card-actions {
   display: flex;
+  justify-content: flex-end;
   gap: 0.5rem;
-  margin-top: 0.5rem;
+  margin-top: 1rem;
 }
 
 .btn {
-  padding: 6px 12px;
+  padding: 8px 16px;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 0.875rem;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  font-weight: 500;
 }
 
 .btn.edit {
-  background-color: #2196F3;
+  background: linear-gradient(to right, #2196f3, #64b5f6);
   color: white;
 }
 
 .btn.delete {
-  background-color: #f44336;
+  background: linear-gradient(to right, #f44336, #e57373);
   color: white;
 }
 
 .btn:hover {
-  opacity: 0.9;
+  filter: brightness(1.05);
+  transform: scale(1.02);
 }
+
 </style>

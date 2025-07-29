@@ -42,14 +42,13 @@
 
 
 
-
   <div class="card-container">
     <div v-for="employee in employees" :key="employee.employee_id" class="employee-card">
       <div class="employee-avatar">{{ employee.name.charAt(0) }}</div>
 
       <p class="employee-employee_id">ID: {{ employee.employee_id }}</p>
       <h5 class="employee-name">{{ employee.name }}</h5>
-      <p class="employee-position">Position: {{ employee.position }}</p>
+      <p class="employee-position">Position: {{ employee.position_}}</p>
       <p class="employee-department">Department: {{ employee.department }}</p>
       <p class="employee-salary">Salary: R {{ employee.salary }}</p>
       <p class="employee-employmentHistory">History: {{ employee.employmentHistory }}</p>
@@ -57,7 +56,7 @@
 
       <div class="action-buttons">
         <button class="btn-edit" @click="editEmployee(employee)">Edit</button>
-        <button class="btn-delete" @click="deleteEmployee(employee.employee_id)">Delete</button>
+       <button class="btn-delete" @click="deleteEmployee(employee.employee_id)">Delete</button>
       </div>
     </div>
   </div>
@@ -75,52 +74,82 @@ export default {
         salary: '',
         employmentHistory: '',
         contact: ''
-      }
+      },
+      isEditing: false
     };
-  },
-  mounted() {
-    this.$store.dispatch('getUsers');
-    this.$store.dispatch('getEmployees');
-    // Removed the hardcoded postEmployees call from here
   },
   computed: {
     employees() {
-      return this.$store.state.employees;
+      return this.$store.state.employees || []
+      // return this.$store.state.employees;
     }
   },
+  mounted() {
+    this.$store.dispatch('getEmployees');
+  },
   methods: {
-    submitEmployee() {
-      // Dispatch the Vuex action with the form data
-      this.$store.dispatch("postEmployees", this.employee)
-        .then(() => {
-          alert("Employee added!");
-          this.$store.dispatch('getEmployees'); // Refresh employee list
-          // Clear form
-          this.employee = {
-            employee_id: '',
-            name: '',
-            position: '',
-            department: '',
-            salary: '',
-            employmentHistory: '',
-            contact: ''
-          };
-        })
-        .catch(err => {
-          console.error("Error adding employee:", err);
-          alert("Failed to add employee.");
-        });
-    },
+submitEmployee() {
+  if (this.isEditing) {
+    // EDITING FLOW
+    this.$store.dispatch('updateEmployee', this.employees)
+      .then(() => {
+        alert("Employee updated!");
+        this.resetForm(); // Close modal & reset form
+      })
+      .catch(err => {
+        console.error("Error updating employee:", err);
+        alert("Failed to update employee.");
+      });
+  } else {
+    // ADDING FLOW
+    this.$store.dispatch("postEmployees", this.employee)
+      .then(() => {
+        alert("Employee added!");
+        this.resetForm(); // Close modal & reset form
+      })
+      .catch(err => {
+        console.error("Error adding employee:", err);
+        alert("Failed to add employee.");
+      });
+  }
+},
+
+
     editEmployee(employee) {
-      alert(`Edit clicked for ${employee.name}`);
-    },
+  this.employee = { ...employee };     // Pre-fill the form
+  this.isEditing = true;               // Switch mode to editing
+
+  // Open the Bootstrap modal
+  const modal = new bootstrap.Modal(document.getElementById("exampleModal"));
+  modal.show();
+},
+
     deleteEmployee(employee_id) {
       if (confirm("Are you sure you want to delete this employee?")) {
-        this.$store.dispatch('deleteEmployee', employee_id);
+        this.$store.dispatch('deleteEmployee', employee_id)
+          .then(() => this.$store.dispatch('getEmployees'));
       }
-    }
+    },
+
+   resetForm() {
+  this.employee = {
+    employee_id: '',
+    name: '',
+    position: '',
+    department: '',
+    salary: '',
+    employmentHistory: '',
+    contact: ''
+  };
+  this.isEditing = false;
+  this.$store.dispatch('getEmployees');
+
+  const modal = bootstrap.Modal.getInstance(document.getElementById("exampleModal"));
+  modal.hide();
+}
   }
 };
+
 </script>
 
 <style scoped>

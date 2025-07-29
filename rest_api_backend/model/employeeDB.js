@@ -33,5 +33,33 @@ const patchEmployees = async (employee_id, name, position, department, salary, e
     throw error;
   }
 };
- 
-export {getEmployees , postEmployees , patchEmployees}
+
+// model/employeeDB.js
+ const deleteEmployees = async (employee_id) => {
+  await pool.query("DELETE FROM employees WHERE employee_id = ?", [employee_id]);
+};
+
+ const updateEmployees = async (id, data) => {
+  const {
+    name,
+    position,
+    department,
+    salary,
+    employmentHistory,
+    contact
+  } = data;
+
+  await pool.query(
+    `UPDATE employees SET 
+      name = ?, 
+      position = ?, 
+      department = ?, 
+      salary = ?, 
+      employmentHistory = ?, 
+      contact = ?
+     WHERE employee_id = ?`,
+    [name, position, department, salary, employmentHistory, contact, id]
+  );
+};
+
+export {getEmployees , postEmployees , patchEmployees , deleteEmployees , updateEmployees}

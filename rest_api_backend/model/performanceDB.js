@@ -15,5 +15,8 @@ const postPerformance = async ( id ,employeeId, rating, description, review_mont
     [ id ,employeeId, rating, description, review_month]
     )
 }
+ const deletePerformance = async (id) => {
+  await pool.query('DELETE FROM performance WHERE id = ?', [id]);
+};
 
-export {getPerformance , postPerformance}
+export {getPerformance , postPerformance,deletePerformance}

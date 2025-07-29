@@ -30,25 +30,6 @@ export default createStore({
     },
   },
   actions: {
-    // USERS
-    async getUsers({ commit }) {
-      try {
-        const response = await axios.get(`${API_URL}/users`);
-        commit('setUsers', response.data.users);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    },
-    async postUsers({ commit }) {
-      try {
-        const response = await axios.get(`${API_URL}/users`);
-        commit('setUsers', response.data.users);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    },
-
-
     // PAYSLIP
     async getPayslip({ commit }) {
       try {
@@ -69,14 +50,16 @@ export default createStore({
       }
     },
 
-    async deletePayslip({ commit }) {
-      try {
-        const response = await axios.get(`${API_URL}/payslip`);
-        commit('setPayslip', response.data.payslip);
-      } catch (error) {
-        console.error("Error deleting payslip:", error);
-      }
-    },
+ async deletePayslip({ dispatch }, id) {
+    try {
+      await axios.delete(`${API_URL}/payslip/${id}`); // ✅ Must match your route
+      dispatch("getPayslip");
+    } catch (error) {
+      console.error("Error deleting payslip:", error);
+      throw error;
+    }
+  },
+
 
     // PERFORMANCE
     async getPerformance({ commit }) {
@@ -106,14 +89,16 @@ export default createStore({
       }
     },
 
-    async deletePerformance({ commit }, payload) {
-      try {
-        const response = await axios.post(`${API_URL}/performance`, payload);
-        commit('setPerformance', response.data.performance);
-      } catch (error) {
-        console.error("Error deleting performance:", error);
-      }
-    },
+     async deletePerformance({ dispatch }, id) {
+    try {
+      await axios.delete(`http://localhost:9090/performance/${id}`);
+      // Refresh list after deletion
+      dispatch('getPerformance');
+    } catch (error) {
+      console.error("Error deleting performance:", error);
+      throw error;
+    }
+  },
 
     // ATTENDANCE
     async getAttendance({ commit }) {
@@ -143,14 +128,19 @@ export default createStore({
       }
     },
 
-    async deleteAttendance({ commit }, payload) {
-      try {
-        const response = await axios.post(`${API_URL}/attendance`, payload);
-        commit('setAttendance', response.data.attendance);
-      } catch (error) {
-        console.error("Error deleting attendance:", error);
-      }
-    },
+async deleteAttendance({ commit }, id) {
+  try {
+    const response = await axios.delete(`${API_URL}/attendance/${id}`);
+    // Optionally update state if your backend returns updated attendance list
+    if (response.data.attendance) {
+      commit('setAttendance', response.data.attendance);
+    }
+    return response;
+  } catch (error) {
+    console.error("Error deleting attendance:", error);
+    throw error;
+  }
+},
 
     // EMPLOYEES
     async getEmployees({ commit }) {
@@ -161,32 +151,28 @@ export default createStore({
         console.error("Error fetching employees:", error);
       }
     },
+async updateEmployee({ commit }, updatedEmployee) {
+  return axios.put(`${API_URL}/employees/${updatedEmployee.employee_id}`, updatedEmployee);
+},
 
-    async postEmployees({ commit }, payload) {
+    async postEmployees({ commit }, employee) {
       try {
-        const response = await axios.post(`${API_URL}/employees`, payload);
-        commit('setEmployees', response.data.employees);
-      } catch (error) {
-        console.error("Error posting employees:", error);
-        return error;
+        const res = await axios.post(`${API_URL}/employees`, employee);
+        return res; // ✅ important
+      } catch (err) {
+        console.error("Failed to post employee", err);
+        throw err;
       }
     },
 
-    async patchEmployees({ commit }) {
+    // Example delete
+    async deleteEmployee({ commit }, employee_id) {
       try {
-        const response = await axios.get(`${API_URL}/employees`);
-        commit('setEmployees', response.data.employees);
-      } catch (error) {
-        console.error("Error patching employees:", error);
-      }
-    },
-
-    async deleteEmployees({ commit }) {
-      try {
-        const response = await axios.get(`${API_URL}/employees`);
-        commit('setEmployees', response.data.employees);
-      } catch (error) {
-        console.error("Error deleting employees:", error);
+        const res = await axios.delete(`${API_URL}/employees/${employee_id}`);
+        return res;
+      } catch (err) {
+        console.error("Failed to delete employee", err);
+        throw err;
       }
     }
   }
