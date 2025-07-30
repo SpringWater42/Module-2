@@ -26,7 +26,7 @@
       <div class="collapse navbar-collapse" id="navbarContent">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <router-link class="nav-link" to="/">Dashboard</router-link>
+            <router-link class="nav-link" to="/dashboard">Dashboard</router-link>
           </li>
           <li class="nav-item">
            <router-link class="nav-link" to="/employees">Employees</router-link> 
@@ -55,6 +55,10 @@ export default {
 components: {
  Navbar,
 },
+mounted() {
+    this.$store.dispatch("fetch_users_info")
+
+}
 }
 
 </script>

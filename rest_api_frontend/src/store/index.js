@@ -5,13 +5,15 @@ const API_URL = "http://localhost:9090"
 
 export default createStore({
   state: {
-    users: [],
     employees: [],
     payslip: [],
     performance: [],
     attendance: [],
+    users: [],
   },
-  getters: {},
+  getters: {
+      allUsers: (state) => state.users
+  },
   mutations: {
     setUsers(state, payload) {
       state.users = payload;
@@ -28,6 +30,15 @@ export default createStore({
     setAttendance(state, payload) {
       state.attendance = payload;
     },
+     get_users(state, payload) {
+            state.users = payload
+        },
+        setUsers(state, users) {
+      state.users = users;
+    },
+    addUser(state, user) {
+      state.users.push(user);
+    }
   },
   actions: {
     // PAYSLIP
@@ -141,39 +152,66 @@ async deleteAttendance({ commit }, id) {
     throw error;
   }
 },
-
-    // EMPLOYEES
-    async getEmployees({ commit }) {
-      try {
-        const response = await axios.get(`${API_URL}/employees`);
-        commit('setEmployees', response.data.employees);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-      }
-    },
+// EMPLOYEES
+async getEmployees({ commit }) {
+  try {
+    const response = await axios.get(`${API_URL}/employees`);
+    commit('setEmployees', response.data.employees);
+  } catch (error) {
+    console.error("Error fetching employees:", error);
+  }
+},
 async updateEmployee({ commit }, updatedEmployee) {
-  return axios.put(`${API_URL}/employees/${updatedEmployee.employee_id}`, updatedEmployee);
+return axios.put(`${API_URL}/employees/${updatedEmployee.employee_id}`, updatedEmployee);
 },
 
-    async postEmployees({ commit }, employee) {
+async postEmployees({ commit }, employee) {
+  try {
+    const res = await axios.post(`${API_URL}/employees`, employee);
+    return res; // ✅ important
+  } catch (err) {
+    console.error("Failed to post employee", err);
+    throw err;
+  }
+},
+
+// Example delete
+async deleteEmployee({ commit }, employee_id) {
+  try {
+    const res = await axios.delete(`${API_URL}/employees/${employee_id}`);
+    return res;
+  } catch (err) {
+    console.error("Failed to delete employee", err);
+    throw err;
+  }
+}
+},
+
+    async fetch_users_info({ commit }) {
       try {
-        const res = await axios.post(`${API_URL}/employees`, employee);
-        return res; // ✅ important
-      } catch (err) {
-        console.error("Failed to post employee", err);
-        throw err;
+        const response = await axios.get('http://localhost:9090/users');
+        commit('setUsers', response.data);
+      } catch (error) {
+        console.error('Failed to fetch users:', error);
       }
     },
+         async fetch_users_password(payload) {
+            return await axios.get('http://localhost:9090/login_password', payload)
+        },
+      async add_users({ dispatch }, payload) {
+            await axios.post('http://localhost:9090/login', payload)
+            dispatch("fetch_users_info")
+        },
 
-    // Example delete
-    async deleteEmployee({ commit }, employee_id) {
-      try {
-        const res = await axios.delete(`${API_URL}/employees/${employee_id}`);
-        return res;
-      } catch (err) {
-        console.error("Failed to delete employee", err);
-        throw err;
-      }
-    }
-  }
-});
+  check_password: async ({ }, payload) => {
+            try {
+                const response = await axios.post('http://localhost:9090/check_password', payload);
+                console.log('Password check result:', response.data.status);
+                return response.data.status; // true or false
+            } catch (error) {
+                console.error('check_password error:', error);
+                return false; // fail-safe fallback
+            }
+        }
+    },
+);

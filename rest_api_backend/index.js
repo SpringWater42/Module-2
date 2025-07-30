@@ -6,6 +6,7 @@ import { getEmployeeCon, postEmployeesCon , deleteEmployeesCon , updateEmployees
 import { getPerformanceCon, postPerformanceCon ,  deletePerformanceCon} from './controller/performanceCon.js';
 import { getAttendanceCon,  postAttendanceCon ,  deleteAttendanceCon } from './controller/attendanceCon.js';
 import { getPayslipCon , postPayslipCon , deletePayslipCon} from './controller/payrollCon.js';
+import { getUsersCon, checkPasswordCon, addUsersCon } from './controller/loginCon.js'
 
 import cors from 'cors';
 
@@ -37,6 +38,11 @@ app.delete('/attendance/:id', deleteAttendanceCon);
 app.get('/payslip', getPayslipCon);
 app.post('/payslip',  postPayslipCon);
 app.delete('/payslip/:id', deletePayslipCon);
+
+
+app.get('/login', getUsersCon)
+app.post('/check_password', checkPasswordCon)
+app.post('/login', addUsersCon)
 
 app.listen(PORT, () => {
   console.log(`http://localhost:${PORT}`);
