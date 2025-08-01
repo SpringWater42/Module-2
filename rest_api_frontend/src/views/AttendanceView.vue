@@ -4,7 +4,7 @@
 
     <!-- Add Attendance Button -->
     <div class="text-center mb-4">
-      <button class="btn btn-success" @click="openAddModal">
+      <button class="btn btn-primary" @click="openAddModal">
         Add Attendance
       </button>
     </div>
@@ -100,12 +100,7 @@
                 <span :class="badgeClass(entry.status)">{{ entry.status }}</span>
               </td>
               <td>
-                <button
-                  class="btn btn-sm btn-primary me-2"
-                  @click="editAttendance(entry)"
-                >
-                  Edit
-                </button>
+                
                 <button
                   class="btn btn-sm btn-danger"
                   @click="deleteAttendance(entry.id)"
@@ -177,7 +172,7 @@ export default {
         case "Approved":
           return "badge bg-success";
         case "Pending":
-          return "badge bg-warning text-dark";
+          return "badge bg-secondary";
         case "Denied":
           return "badge bg-danger";
         default:
@@ -229,6 +224,23 @@ export default {
 </script>
 
 <style scoped>
+.btn{
+  background: linear-gradient(135deg, #2C3E50, #4A6491);
+  color: white;
+  border: none;
+  font-weight: 70;
+  font-size: 14px;
+  padding: 0.4rem 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  background: linear-gradient(135deg, #4A6491, #2C3E50);
+}
 /* Container for attendance cards in rows of 2 */
 .attendance-groups {
   display: flex;
@@ -239,7 +251,7 @@ export default {
 
 /* Each card styling */
 .attendance-group {
-  background: linear-gradient(135deg, #5a5aa0, #875b87);
+  background: linear-gradient(to right, #202088, #794a79);
   border-radius: 12px;
   padding: 1rem 1.2rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
@@ -277,6 +289,34 @@ export default {
   background: rgba(255 255 255 / 0.1);
   color: #f0e9ff;
 }
+
+.btn.btn-sm.btn-primary {
+  background: linear-gradient(to right, #2196f3, #64b5f6);
+  border: none;
+  color: white;
+  transition: background 0.3s ease;
+}
+
+.btn.btn-sm.btn-primary:hover {
+  background: linear-gradient(to right, #1976d2, #42a5f5);
+}
+
+/* Delete button gradient */
+.btn.btn-sm.btn-danger {
+  background: linear-gradient(to right, #f44336, #e57373);
+  border: none;
+  color: white;
+  transition: background 0.3s ease;
+}
+
+.btn.btn-sm.btn-danger:hover {
+  background: linear-gradient(to right, #d32f2f, #ef5350);
+}
+
+h2.mb-4.text-center {
+  color: #e0e0e0; /* Light grey */
+}
+
 
 /* Responsive: full width cards on small screens */
 @media (max-width: 768px) {

@@ -1,13 +1,18 @@
 import mysql from 'mysql2/promise';
-import {config} from 'dotenv';
+import { config } from 'dotenv';
 
 config();
 
+console.log("Connecting with:", {
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD ? '✔️ SET' : '❌ NOT SET',
+  database: process.env.DB_NAME,
+});
 
 export const pool = mysql.createPool({
-    host:process.env.host ,
-    database:process.env.database,
-    user:process.env.user ,
-    password:process.env.password,
-
-}) ;
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});

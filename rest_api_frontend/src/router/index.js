@@ -4,10 +4,16 @@ import PayRollView from '@/views/PayrollView.vue'
 import AttendanceView from '@/views/AttendanceView.vue'
 import PerformanceView from '@/views/PerformanceView.vue'
 import EmployeesView from '@/views/EmployeesView.vue'
+import Login from '@/views/Login.vue'
 
 const routes = [
-  {
+   {
     path: '/',
+    name: 'Login',
+    component: Login
+  },
+  {
+    path: '/dashboard',
     name: 'DashboardView',
     component: DashboardView
   },
@@ -22,6 +28,7 @@ const routes = [
     name: 'payroll',
     component: PayRollView
   },
+ 
   {
     path: '/attendance',
     name: 'attendance',

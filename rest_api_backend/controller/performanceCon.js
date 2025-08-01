@@ -1,31 +1,54 @@
-import { getPerformance ,  postPerformance , deletePerformance } from "../model/performanceDB.js"
+import { getPerformance, postPerformance, updatePerformance, deletePerformance } from '../model/performanceDB.js';
 
-export const getPerformanceCon= async(req,res) => {
-    res.json({performance: await getPerformance()})
-}
-
-
-
-
-
-export const postPerformanceCon= async (req, res) => {
+export const getPerformanceCon = async (req, res) => {
   try {
-    console.log("Received data:", req.body); 
+    const performance = await getPerformance();
+    res.json({ performance });
+  } catch (error) {
+    console.error('Error fetching performance:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
-    const { employeeId, name, position, department, salary, employmentHistory, contact } = req.body;
+export const postPerformanceCon = async (req, res) => {
+  try {
+    const { employeeId, rating, description, review_month } = req.body;
+    if (
+      employeeId === undefined ||
+      rating === undefined ||
+      !description ||
+      !review_month
+    ) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    await postPerformance(Number(employeeId), Number(rating), description, review_month);
+    res.status(201).json({ message: 'Performance record added successfully' });
+  } catch (error) {
+    console.error('Error posting performance:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
-    if (!employeeId) {
-      return res.status(400).json({ error: "Missing employeeId" });
+export const updatePerformanceCon = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { employeeId, rating, description, review_month } = req.body;
+
+    if (
+      !id ||
+      employeeId === undefined ||
+      rating === undefined ||
+      !description ||
+      !review_month
+    ) {
+      return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    console.log("Inserting employee:", employeeId, name, position);
-
-    await postPerformance(employeeId, name, position, department, salary, employmentHistory, contact);
-    res.status(201).json({ message: "Employee added successfully" });
-
-  } catch (err) {
-    console.error("Server Error:", err);
-    res.status(500).json({ error: "Internal server error" });
+    await updatePerformance(Number(id), Number(employeeId), Number(rating), description, review_month);
+    res.json({ message: 'Performance record updated successfully' });
+  } catch (error) {
+    console.error('Error updating performance:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 
@@ -33,12 +56,9 @@ export const deletePerformanceCon = async (req, res) => {
   try {
     const { id } = req.params;
     await deletePerformance(id);
-    res.status(200).json({ message: "Performance record deleted." });
-  } catch (err) {
-    console.error("Error deleting performance:", err);
-    res.status(500).json({ error: "Failed to delete performance." });
+    res.status(200).json({ message: 'Performance record deleted.' });
+  } catch (error) {
+    console.error('Error deleting performance:', error);
+    res.status(500).json({ error: 'Failed to delete performance.' });
   }
 };
-
-
-export { getPerformance }

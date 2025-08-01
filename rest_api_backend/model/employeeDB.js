@@ -1,45 +1,42 @@
-import {pool} from '../config/db.js'
+import { pool } from '../config/db.js';
 
+// Get all employees
+const getEmployees = async () => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM employees;');
+    return rows;
+  } catch (error) {
+    console.error("Error fetching employees:", error);
+    return 'err';
+  }
+};
 
-const getEmployees = async() => {
-    try{
-        let [row] = await pool.query( 'SELECT * FROM employees;')
-        return row
-    } catch (error) {
-        return 'err'
-    }
-}
-
+// Add a new employee
 const postEmployees = async (employee_id, name, position, department, salary, employmentHistory, contact) => {
-    await pool.query(`INSERT INTO employees (employee_id, name, position_, department, salary, employmentHistory, contact) VALUES (?,?,?,?,?,?,?);`,
+  await pool.query(
+    `INSERT INTO employees (employee_id, name, position_, department, salary, employmentHistory, contact) 
+     VALUES (?, ?, ?, ?, ?, ?, ?);`,
     [employee_id, name, position, department, salary, employmentHistory, contact]
-    )
-}
+  );
+};
 
+// Partially update an employee
 const patchEmployees = async (employee_id, name, position, department, salary, employmentHistory, contact) => {
   try {
-    console.log('Updating employee:', { employee_id, name, position, department, salary, employmentHistory, contact });
-
     await pool.query(
       `UPDATE employees 
        SET name = ?, position_ = ?, department = ?, salary = ?, employmentHistory = ?, contact = ?
        WHERE employee_id = ?;`,
       [name, position, department, salary, employmentHistory, contact, employee_id]
     );
-
-    console.log('Update successful');
   } catch (error) {
-    console.error('Error updating employee:', error);
+    console.error('Error updating employee (PATCH):', error);
     throw error;
   }
 };
 
-// model/employeeDB.js
- const deleteEmployees = async (employee_id) => {
-  await pool.query("DELETE FROM employees WHERE employee_id = ?", [employee_id]);
-};
-
- const updateEmployees = async (id, data) => {
+// Fully update an employee
+const updateEmployees = async (id, data) => {
   const {
     name,
     position,
@@ -52,7 +49,7 @@ const patchEmployees = async (employee_id, name, position, department, salary, e
   await pool.query(
     `UPDATE employees SET 
       name = ?, 
-      position = ?, 
+      position_ = ?, 
       department = ?, 
       salary = ?, 
       employmentHistory = ?, 
@@ -62,4 +59,15 @@ const patchEmployees = async (employee_id, name, position, department, salary, e
   );
 };
 
-export {getEmployees , postEmployees , patchEmployees , deleteEmployees , updateEmployees}
+// Delete an employee
+const deleteEmployees = async (employee_id) => {
+  await pool.query("DELETE FROM employees WHERE employee_id = ?", [employee_id]);
+};
+
+export {
+  getEmployees,
+  postEmployees,
+  patchEmployees,
+  updateEmployees,
+  deleteEmployees
+};

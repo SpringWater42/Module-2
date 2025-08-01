@@ -1,13 +1,11 @@
 <template>
+  <nav v-if="$route.path !== '/'" class="navbar navbar-expand-lg navbar-dark bg-dark">
 
-
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-<div class="app-header">
-  <img src="@/assets/logo.png" alt="Logo" class="app-logo" />
-  <h2 class="app-title">ModernTech Solutions</h2>
-</div>
-
+      <div class="app-header">
+        <img src="@/assets/logo.png" alt="Logo" class="app-logo" />
+        <h2 class="app-title">ModernTech Solutions</h2>
+      </div>
 
       <!-- Toggler button for small screens -->
       <button
@@ -26,47 +24,84 @@
       <div class="collapse navbar-collapse" id="navbarContent">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <router-link class="nav-link" to="/">Dashboard</router-link>
+            <router-link class="nav-link" to="/dashboard"
+              >Dashboard</router-link
+            >
           </li>
           <li class="nav-item">
-           <router-link class="nav-link" to="/employees">Employees</router-link> 
+            <router-link class="nav-link" to="/employees"
+              >Employees</router-link
+            >
           </li>
           <li class="nav-item">
             <router-link class="nav-link" to="/payroll">PayRoll</router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/attendance">Attendance</router-link>
+            <router-link class="nav-link" to="/attendance"
+              >Attendance</router-link
+            >
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/performance">Performance</router-link>
+            <router-link class="nav-link" to="/performance"
+              >Performance</router-link>
+          </li>
+  
+          <li class="nav-item">
+            <button @click="logout" class="nav-link btn btn-link" style="">
+              Logout
+            </button>
           </li>
         </ul>
       </div>
     </div>
   </nav>
-     <Navbar />
+  <Navbar />
 </template>
 
 <script>
+import Navbar from "./components/Navbar.vue";
+import logoImage from "@/assets/logo.png";
 
-import Navbar from './components/Navbar.vue';
-
-export default { 
-components: {
- Navbar,
-},
-}
-
+export default {
+  components: {
+    Navbar,
+  },
+  data() {
+    return {
+      isSticky: false,
+      navOffsetTop: 0,
+      logoImage,
+    };
+  },
+  methods: {
+    scrollToTop() {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+    handleScroll() {
+      if (!this.$refs.mainNav) return;
+      const nav = this.$refs.mainNav;
+      if (this.navOffsetTop === 0) {
+        this.navOffsetTop = nav.offsetTop;
+      }
+      this.isSticky = window.scrollY >= this.navOffsetTop;
+    },
+    logout() {
+      this.$store.commit("setUserLoggedIn", false);
+      this.$router.push("/");
+    },
+  },
+  mounted() {
+    window.addEventListener("scroll", this.handleScroll);
+  },
+  beforeDestroy() {
+    window.removeEventListener("scroll", this.handleScroll);
+  }
+};
 </script>
 
-
-
-
-
 <style>
-
 #app {
- background-image: url(assets/main-background.jpg);
+  background-image: url(assets/main-background.jpg);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -101,7 +136,6 @@ components: {
   font-weight: bold;
   color: #d5caca;
 }
-
 
 nav {
   padding: 30px;

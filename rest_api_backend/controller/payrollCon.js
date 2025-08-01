@@ -1,5 +1,10 @@
-// controller/payslipController.js
-import { getPayslip, postPayslip, patchPayslip, deletePayslip } from "../model/payslipDB.js";
+import {
+  getPayslip,
+  getPayslipById,
+  postPayslip,
+  patchPayslip,
+  deletePayslip
+} from "../model/payslipDB.js";
 
 // Get all payslips
 const getPayslipCon = async (req, res) => {
@@ -12,12 +17,32 @@ const getPayslipCon = async (req, res) => {
   }
 };
 
+// Get a single payslip by employeeId
+const getPayslipByIdCon = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const payslip = await getPayslipById(id);
+    if (!payslip) {
+      return res.status(404).json({ error: "Payslip not found" });
+    }
+    res.json(payslip);
+  } catch (err) {
+    console.error("Error fetching payslip:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 // Add a new payslip
 const postPayslipCon = async (req, res) => {
   try {
     const { employeeId, hoursWorked, leaveDeductions, finalSalary } = req.body;
 
-    if (!employeeId || hoursWorked == null || leaveDeductions == null || finalSalary == null) {
+    if (
+      !employeeId ||
+      hoursWorked == null ||
+      leaveDeductions == null ||
+      finalSalary == null
+    ) {
       return res.status(400).json({ error: "Missing required payslip fields" });
     }
 
@@ -34,7 +59,12 @@ const patchPayslipCon = async (req, res) => {
   try {
     const { employeeId, hoursWorked, leaveDeductions, finalSalary } = req.body;
 
-    if (!employeeId || hoursWorked == null || leaveDeductions == null || finalSalary == null) {
+    if (
+      !employeeId ||
+      hoursWorked == null ||
+      leaveDeductions == null ||
+      finalSalary == null
+    ) {
       return res.status(400).json({ error: "Missing fields for update" });
     }
 
@@ -46,16 +76,22 @@ const patchPayslipCon = async (req, res) => {
   }
 };
 
-// Delete a payslip
- const deletePayslipCon = async (req, res) => {
+// Delete a payslip by employeeId
+const deletePayslipCon = async (req, res) => {
   const { id } = req.params;
   try {
     await deletePayslip(id);
-    res.status(200).json({ message: 'Payslip deleted successfully' });
+    res.status(200).json({ message: "Payslip deleted successfully" });
   } catch (err) {
     console.error("Error deleting payslip:", err);
-    res.status(500).json({ error: 'Failed to delete payslip' });
+    res.status(500).json({ error: "Failed to delete payslip" });
   }
 };
 
-export { getPayslipCon, postPayslipCon, patchPayslipCon, deletePayslipCon };
+export {
+  getPayslipCon,
+  getPayslipByIdCon,
+  postPayslipCon,
+  patchPayslipCon,
+  deletePayslipCon
+};
